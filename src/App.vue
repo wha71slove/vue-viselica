@@ -7,6 +7,7 @@ import GamePopup from './components/GamePopup.vue'
 import GameNotification from './components/GameNotification.vue'
 import { computed, ref, watch } from 'vue'
 import { getRandomName } from './api/getRandomName'
+import GameNotificationLanguage from './components/GameNotificationLanguage.vue'
 
 const word = ref('')
 const getRandomWord = async () => {
@@ -26,6 +27,7 @@ const wrongLetters = computed(() => letters.value.filter((x) => !word.value.incl
 const isLose = computed(() => wrongLetters.value.length === 6)
 const isWin = computed(() => [...word.value].every((x) => correctLetters.value.includes(x)))
 const notification = ref<InstanceType<typeof GameNotification> | null>(null)
+const notificationLanguage = ref<InstanceType<typeof GameNotificationLanguage> | null>(null)
 const popup = ref<InstanceType<typeof GamePopup> | null>(null)
 
 watch(wrongLetters, () => {
@@ -54,6 +56,12 @@ window.addEventListener('keydown', ({ key }) => {
   if (/[а-яА-ЯёЁ]/.test(key)) {
     letters.value.push(key.toLowerCase())
   }
+
+  if (/[a-zA-Z]/.test(key)) {
+    notificationLanguage.value?.open()
+    setTimeout(() => notificationLanguage.value?.close(), 2000)
+    return
+  }
 })
 
 const restart = async () => {
@@ -73,6 +81,7 @@ const restart = async () => {
 
   <GamePopup :word="word" ref="popup" @restsrt="restart" />
   <GameNotification ref="notification" />
+  <GameNotificationLanguage ref="notificationLanguage" />
 </template>
 
 <style scoped></style>
